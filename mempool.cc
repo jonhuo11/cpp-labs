@@ -9,7 +9,7 @@ template <typename T>
 class MemPool {
     size_t size_in_bytes;
     void* pool_ptr;
-    vector<bool> slot_states;
+    vector<bool> slot_states; // false if empty
 
    public:
     MemPool(size_t size_in_bytes) : size_in_bytes(size_in_bytes) {
@@ -75,6 +75,10 @@ class MemPool {
 
     size_t get_size() const {
         return size_in_bytes;
+    }
+
+    bool is_slot_free(unsigned int index) const {
+        return is_slot_valid(index) && !slot_states[index];
     }
 
    private:

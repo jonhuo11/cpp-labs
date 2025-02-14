@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <utility>
 
 using namespace std;
 
@@ -10,7 +11,7 @@ class DynArr {
 
   public:
     DynArr(size_t size): size(size) {
-        ptr = new T[size];
+        ptr = new T[size]();
     }
 
     ~DynArr() {
@@ -19,7 +20,8 @@ class DynArr {
 
     // Move Constructor
     DynArr(DynArr&& other) noexcept
-        : ptr(other.ptr), size(other.size) {
+        : size(other.size),  // Must come first due to member declaration order
+          ptr(other.ptr) {
         other.ptr = nullptr;
         other.size = 0;
     }
@@ -44,30 +46,32 @@ class DynArr {
 
     // resize
     void resize(size_t new_size) {
-        if (i < 0) {
-            throw std::bad_array_new_length();
-        }
-        T* new_arr = new T[new_size];
-        for (int i = 0; i < min(new_size, size); i++) {
+        T* new_arr = new T[new_size]();
+        for (size_t i = 0; i < min(new_size, size); i++) {
             new_arr[i] = ptr[i];
         }
         delete[] ptr;
+        size = new_size;
         ptr = new_arr;
     }
 
     // access
     T& operator[](size_t i) {
-        if (i < 0 || i >= size) {
-            throw std::out_of_range();
+        if (i >= size) {
+            throw out_of_range("Index out of bounds");
         }
         return ptr[i];
     }
     
     T& operator[](size_t i) const {
-        if (i < 0 || i >= size) {
-            throw std::out_of_range();
+        if (i >= size) {
+            throw out_of_range("Index out of bounds");
         }
         return ptr[i];
+    }
+
+    size_t getSize() const {
+        return size;
     }
 };
 

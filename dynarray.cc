@@ -18,27 +18,27 @@ class DynArr {
     }
 
     // Move Constructor
-    DynamicArray(DynamicArray&& other) noexcept
-        : data(other.data), size(other.size) {
-        other.data = nullptr;
+    DynArr(DynArr&& other) noexcept
+        : ptr(other.ptr), size(other.size) {
+        other.ptr = nullptr;
         other.size = 0;
     }
 
     // Move Assignment
-    DynamicArray& operator=(DynamicArray&& other) noexcept {
+    DynArr& operator=(DynArr&& other) noexcept {
         if (this != &other) {
-            delete[] data;
-            data = other.data;
+            delete[] ptr;
+            ptr = other.ptr;
             size = other.size;
-            other.data = nullptr;
+            other.ptr = nullptr;
             other.size = 0;
         }
         return *this;
     }
 
     // Prevent accidental copies
-    DynamicArray(const DynamicArray&) = delete;
-    DynamicArray& operator=(const DynamicArray&) = delete;
+    DynArr(const DynArr&) = delete;
+    DynArr& operator=(const DynArr&) = delete;
 
     // Operators to implement
 
@@ -57,7 +57,10 @@ class DynArr {
 
     // access
     T& operator[](size_t i) {
-        return this->operator[](i);
+        if (i < 0 || i >= size) {
+            throw std::out_of_range();
+        }
+        return ptr[i];
     }
     
     T& operator[](size_t i) const {

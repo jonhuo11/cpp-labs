@@ -5,4 +5,4 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-g++ -std=c++23 -x c++ "$1" -o /dev/shm/a.out && /dev/shm/a.out
+g++ -std=c++23 -x c++ "$1" -o ./tmp/a.out && ./tmp/a.out

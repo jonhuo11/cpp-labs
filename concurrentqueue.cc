@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include <mutex>
 #include <queue>
 #include <condition_variable>
@@ -26,6 +28,7 @@ public:
 
     ~ConcurrentSafeWorkQueue() {
         shutdown_queue();
+        // TODO: we need to wait for everyone to be free before allowing the dtor to continue
     }
 
     void shutdown_queue() {
@@ -46,7 +49,7 @@ public:
             return;
         }
 
-        work_queue.push(move(work_unit));
+        work_queue.push(std::move(work_unit));
 
         lock.unlock();
         cv.notify_one();
@@ -58,7 +61,7 @@ public:
      * Blocking function which accepts work
      * Moves ownership of the work to the caller
      */
-    bool consume_work(T& target) {
+    bool consume_work(T* target) {
         unique_lock<mutex> lock(mt);
         cv.wait(lock, [this] {return shutdown || work_queue.size() > 0; });
 
@@ -66,7 +69,7 @@ public:
             return false;
         }
         
-        *target = move(work_queue.front());
+        *target = std::move(work_queue.front());
         work_queue.pop();
 
         lock.unlock();
